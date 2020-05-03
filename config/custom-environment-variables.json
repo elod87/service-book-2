@@ -1,0 +1,9 @@
+{
+    "googleId": "googleId",
+    "googleSecret": "googleSecret",
+    "googleRefreshToken": "googleRefreshToken",
+    "db":"db",
+    "apiMail":"apiMail",
+    "jwtPrivateKey":"jwtPrivateKey",
+    "importFile":"importFile"
+}
