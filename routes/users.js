@@ -57,11 +57,14 @@ router.post('/forgotpass', async (req, res) => {
 });
 
 //reset password
-router.post('/resetpass', auth, async (req, res) => {
-    const { password } = req.body;
+router.post('/resetpassword', auth, async (req, res) => {
+    const { currentPassword, password } = req.body;
 
     const user = await User.findById(req.user._id);
     if (user) {
+        const validPassword = await bcrypt.compare(currentPassword, user.password);
+        if (!validPassword) return res.status(401).send('Password incorrect');
+
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
 
