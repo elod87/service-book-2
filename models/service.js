@@ -109,9 +109,10 @@ serviceSchema.statics = {
             .populate('newDevices.deviceRef', 'name serial')
             .lean();
     },
-    getTotalCount: function (searchString) {
+    getTotalCount: function (searchString, statusFilter) {
         return this.count({
-            "$or": createSearchConditions(searchString)
+            status: statusFilter ? { $in: statusFilter.split(',') } : { $ne: null },
+            "$or": createSearchConditions(searchString, statusFilter)
         });
     }
 }

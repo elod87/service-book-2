@@ -59,7 +59,7 @@ const formatReturnedService = (service) => {
 
 //get all services
 router.get('/', auth, async (req, res) => {
-    const pageSize = 20;
+    const pageSize = req.query.per_page ? Number(req.query.per_page) : 20;
     const page = Number(req.query.page);
     const search = req.query.search;
     const orderByColumn = req.query.orderByColumn === 'customer' ? 'customer.customerName' : req.query.orderByColumn;
@@ -72,11 +72,18 @@ router.get('/', auth, async (req, res) => {
         .limit(pageSize)
         .sort(sortString);
 
+    const totalCount = await Service.getTotalCount(search, statusFilter);
+
     for (var service of services) {
         formatReturnedService(service);    
     }
 
-    res.send(services);
+    const result = {
+        services,
+        hasMore: (page + 1) * pageSize < totalCount
+    }
+
+    res.send(result);
 });
 
 //create new service
