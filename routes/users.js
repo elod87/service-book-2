@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
 })
 
 //forgot password
-router.post('/forgotpass', async (req, res) => {
+router.post('/forgotpassword', async (req, res) => {
     const email = req.body.email;
 
     const user = await User.findOne({ email });
@@ -56,8 +56,25 @@ router.post('/forgotpass', async (req, res) => {
     }
 });
 
-//reset password
+//reset password - initialized by forgot password
 router.post('/resetpassword', auth, async (req, res) => {
+    const { password } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (user) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(password, salt);
+
+        await user.save();
+
+        res.send('Password was successfully reset');
+    } else {
+        res.status(400).send('User not found');
+    }
+});
+
+//change password
+router.post('/changepassword', auth, async (req, res) => {
     const { currentPassword, password } = req.body;
 
     const user = await User.findById(req.user._id);
