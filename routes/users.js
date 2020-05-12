@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const { User, validate } = require('../models/user');
 const auth = require('../middleware/auth');
 const mailSend = require('../startup/mail');
+const validateObjectId = require('../middleware/validateObjectId');
 
 
 //verify current user
@@ -35,7 +36,21 @@ router.post('/', async (req, res) => {
 
     user.sendMailValidation();
     user.sendForApproval();
-})
+});
+
+
+//update user
+router.put('/:id', [auth, validateObjectId], async (req, res) => {    
+    const user = await User.findByIdAndUpdate(req.params.id, {
+        name: req.body.name
+    }, {
+        new: true
+    });
+
+    if (!user) return res.status(404).send('User not found');
+ 
+    res.send(user);
+});
 
 //forgot password
 router.post('/forgotpassword', async (req, res) => {
