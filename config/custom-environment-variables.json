@@ -5,5 +5,10 @@
     "db":"db",
     "apiMail":"apiMail",
     "jwtPrivateKey":"jwtPrivateKey",
+    "jwtRefreshTokenKey":"jwtRefreshTokenKey",
+    "jwtGoogleLoginTokenKey":"jwtGoogleLoginTokenKey",
+    "jwtResetPasswordTokenKey":"jwtResetPasswordTokenKey",
+    "jwtMailActivateTokenKey":"jwtMailActivateTokenKey",
+    "jwtApproveUserTokenKey":"jwtApproveUserTokenKey",
     "importFile":"importFile"
 }

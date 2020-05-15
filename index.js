@@ -2,11 +2,15 @@ const winston = require('winston');
 const express = require('express');
 const cors = require('cors');
 const passport = require('passport');
+const cookieParser = require('cookie-parser');
+const config = require('config');
 const app = express();
 
 app.use(express.static('public'));
 
-app.use(cors());
+app.use(cors({credentials: true, origin: config.get('clientURL')}));
+
+app.use(cookieParser());
 
 //initialize passport
 app.use(passport.initialize());

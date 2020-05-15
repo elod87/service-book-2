@@ -37,25 +37,103 @@ const userSchema = new Schema({
     isValidMail: {
         type: Boolean,
         default: false
-    }
+    },
+    refreshTokens: [String],
+    passwordResetTokens: [String]
 });
 
+/* 
+generate tokens used in classic login
+token - session token used in api calls when interacting with the app, expires in 15 minutes
+refresh token - allows getting new session token for keeping users logged in, expires in 2 months 
+*/
 userSchema.methods.generateAuthToken = function () {
-    return jwt.sign({ _id: this._id }, config.get('jwtPrivateKey'));
+    //refresh token
+    const refreshToken = jwt.sign({ id: this._id }, config.get('jwtRefreshTokenKey'), {
+        expiresIn: 60 * 60 * 24 * 30 * 2 //2 months
+    });
+
+    //session token
+    const token = jwt.sign({ id: this._id }, config.get('jwtPrivateKey'), {
+        expiresIn: 60 * 15 //15 minutes
+    });
+
+    return {
+        token,
+        refreshToken
+    }
 }
 
+/*
+generate google login token
+- generates a temporary token which can be used for user validation after successful google login
+- token expires in 60 seconds
+*/
+userSchema.methods.generateGoogleLoginToken = function () {
+    const googleToken = jwt.sign({ id: this._id }, config.get('jwtGoogleLoginTokenKey'), {
+        expiresIn: 60 //60 seconds
+    });
+
+    return googleToken;
+}
+
+/* 
+generate password reset token 
+- used in the link which is sent to the user who wants to reset forgotten password
+- token can be used only once 
+*/
+userSchema.methods.generatePasswordResetToken = function () {
+    const resetToken = jwt.sign({ id: this._id }, config.get('jwtResetPasswordTokenKey'));
+
+    return resetToken;
+}
+
+/* generate new user mail activation token 
+- used in the link which is sent to the user for validating mail address during registration 
+- token expires in 60 minutes
+*/
+userSchema.methods.generateMailActivationToken = function () {
+    const mailToken = jwt.sign({ id: this._id }, config.get('jwtMailActivateTokenKey'), {
+        expiresIn: 60 * 60 //expires in 60 minutes
+    });
+
+    return mailToken;
+}
+
+/* generate admin user approve token 
+- used in the link which is sent to the admins for approving new user or revoking rights 
+*/
+userSchema.methods.generateApproveUserToken = function () {
+    const approveToken = jwt.sign({ id: this._id }, config.get('jwtApproveUserTokenKey'));
+
+    return approveToken;
+}
+
+// user information returned to the client
+userSchema.methods.getUserInfoObj = function() {
+    return {
+        _id: this._id,
+        name: this.name,
+        email: this.email,
+        isGoogleAccount: this.googleId !== '',
+        thumbnail: this.thumbnail
+    }
+}
+
+// send mail to user - validating email address after registration
 userSchema.methods.sendMailValidation = function () {
     //send confirmation mail
     mailSend({
         to: this.email,
         subject: 'Service Book registration - validate email',
         bodyHtml: `<div>Hi ${this.name}, validate your email by clicking the link below</div>
-        <a href="${config.get('endpointURL')}/users/validate/${this._id}/${this.generateAuthToken()}" target="_blank">Click here</a>`
+        <a href="${config.get('endpointURL')}/users/validate/${this.generateMailActivationToken()} "target="_blank">Activate account</a>`
     });
 }
 
+// send mail to admin - approve or revoke user account
 userSchema.methods.sendForApproval = function () {
-    const token = this.generateAuthToken();
+    const token = this.generateApproveUserToken();
     //send mail to admins for new user approval
     mailSend({
         to: config.get('apiMail'),
@@ -64,8 +142,8 @@ userSchema.methods.sendForApproval = function () {
         <p>Name: ${this.name}</p>
         <p>Mail: ${this.email}</p>
         <p>Is from google: ${this.googleId == '' ?  'NO' : 'YES'}</p>
-        <a href="${config.get('endpointURL')}/users/approve/${this._id}/${token}/1" target="_blank">Approve</a>
-        <a href="${config.get('endpointURL')}/users/approve/${this._id}/${token}/0" target="_blank">Deny</a>`
+        <a href="${config.get('endpointURL')}/users/approve/${token}/1" target="_blank">Approve</a>
+        <a href="${config.get('endpointURL')}/users/approve/${token}/0" target="_blank">Deny</a>`
     });
 }
 

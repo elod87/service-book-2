@@ -1,5 +1,6 @@
 .vscode/
 node_modules/
 set_env.bat
+.env
 package-lock.json
 import.json
