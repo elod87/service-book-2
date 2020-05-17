@@ -11,7 +11,7 @@ const validateObjectId = require('../middleware/validateObjectId');
 
 //verify current user
 router.get('/me', auth, async (req, res) => {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findById(req.user.id).select('-password');
     res.send(user);
 })
 
@@ -110,7 +110,7 @@ router.post('/resetpassword', async (req, res) => {
 router.post('/changepassword', auth, async (req, res) => {
     const { currentPassword, password } = req.body;
 
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user.id);
     if (user) {
         const validPassword = await bcrypt.compare(currentPassword, user.password);
         if (!validPassword) return res.status(401).send('Password incorrect');
