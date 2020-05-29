@@ -198,13 +198,17 @@ router.put('/:id', [auth, validateObjectId], async (req, res) => {
         service.lastModified = Date.now();
 
         //check if status was updated and add change to history
-        const lastStatus = service.statusChangeHistory[service.statusChangeHistory.length - 1].status;
+        let lastStatus = null;
+        if (service.statusChangeHistory && service.statusChangeHistory.length > 0) {
+            lastStatus = service.statusChangeHistory[service.statusChangeHistory.length - 1].status;
+        }
+
         if (service['status'] !== lastStatus) {
             service.statusChangeHistory.push({
                 status: service['status'],
                 date: Date.now()
             });
-        }        
+        }     
 
         await service.save();
 
