@@ -115,6 +115,12 @@ router.post('/', auth, async (req, res) => {
         }
     }
 
+    //add new state to state history
+    service.statusChangeHistory.push({
+        status: 'received',
+        date: Date.now()
+    });
+
     let newService = await service.save();
 
     newService = await Service.findById(newService._id)
@@ -190,6 +196,15 @@ router.put('/:id', [auth, validateObjectId], async (req, res) => {
         }
 
         service.lastModified = Date.now();
+
+        //check if status was updated and add change to history
+        const lastStatus = service.statusChangeHistory[service.statusChangeHistory.length - 1].status;
+        if (service['status'] !== lastStatus) {
+            service.statusChangeHistory.push({
+                status: service['status'],
+                date: Date.now()
+            });
+        }        
 
         await service.save();
 

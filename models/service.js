@@ -38,6 +38,16 @@ const serviceSchema = new Schema({
             type: String
         }
     },
+    statusChangeHistory: [
+        {
+            status: {
+                type: String
+            },
+            date: {
+                type: Date
+            }
+        }
+    ],
     devices: [
         {
             deviceRef: {
