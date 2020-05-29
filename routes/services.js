@@ -189,6 +189,8 @@ router.put('/:id', [auth, validateObjectId], async (req, res) => {
             }
         }
 
+        service.lastModified = Date.now();
+
         await service.save();
 
         const updatedService = await Service.findById(service._id)

@@ -25,6 +25,10 @@ const serviceSchema = new Schema({
         type: String,
         default: 'received'
     },
+    lastModified: {
+        type: Date,
+        default: Date.now
+    },
     customer: {
         customerRef: {
             type: Schema.Types.ObjectId,
