@@ -1,4 +1,4 @@
 {
-    "clientURL":"http://localhost:3000",
+    "clientURL":"https://demo.service-book.app/",
     "endpointURL":"https://radiant-crag-38285.herokuapp.com"
 }
