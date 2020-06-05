@@ -8,11 +8,11 @@ const app = express();
 
 app.use(express.static('public'));
 
-const whitelist = [config.get('clientURL'), 'http://localhost:3000'];
+const whitelist = [config.get('clientURL'), 'http://localhost:3000', 'http://localhost:4000'];
 const corsOptions = {
   credentials: true,
   origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
+    if (origin === undefined || whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -20,7 +20,6 @@ const corsOptions = {
   }
 }
 app.use(cors(corsOptions));
-
 
 app.use(cookieParser());
 
