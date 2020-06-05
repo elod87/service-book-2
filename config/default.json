@@ -1,4 +1,4 @@
 {
-    "clientURL":"http://localhost:4000",
-    "endpointURL":"http://localhost:3000"
+    "clientURL":"http://localhost:3000",
+    "endpointURL":"http://localhost:4000"
 }
