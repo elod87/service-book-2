@@ -14,12 +14,11 @@ const serviceSchema = new Schema({
     },
     description: {
         type: String,
-        required: true,
-        maxlength: 200
+        required: true
+        
     },
     remark: {
-        type: String,
-        maxlength: 200
+        type: String        
     },
     status: {
         type: String,
@@ -138,7 +137,7 @@ function validateService(service) {
         id: Joi.string().allow(''),
         customer: Joi.objectId().required(),
         date: Joi.date().iso(),
-        description: Joi.string().max(200).required(),
+        description: Joi.string().required(),
         devices: Joi.array().min(1).required(),
         status: Joi.string(),
         remark: Joi.string().allow(''),
